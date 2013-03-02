@@ -1,0 +1,38 @@
+#coding: utf-8
+
+from settings import api, db
+from parse_text import parse_text
+
+
+class KeywordCounter:
+    def __init__(self, text):
+        sentences = text.split(u"。".encode("utf-8"));
+        self.keyword = {};
+        for sentence in sentences:
+            print sentence
+            parsed_data = parse_text(sentence + u"。".encode("utf-8"));
+            for data in parsed_data:
+                if (data["POS"] == u"名詞"):
+                    key = data["Surface"].replace(".", "_");
+                    if (self.keyword.has_key(key)):
+                        self.keyword[key] += 1;
+                    else:
+                        self.keyword[key] = 1;
+        self.keyword = DictVector(self.keyword);
+        print self.keyword
+
+
+def crawl(username):
+    tweets = api.user_timeline(screen_name=username);
+    records = [{"created_at": tweet.created_at, "_id": tweet.id, "text": tweet.text, "username": username, "keywords": KeywordCounter(tweet.text).keyword.get_nomal()} for tweet in tweets];
+
+    for tweet in tweets:
+        keywords = KeywordCounter(tweet.text).keyword.get_nomal();
+        old = db.tweets.find({"username":username});
+        r = keywords * 
+
+    
+    db.tweets.insert(records);
+
+if __name__ == "__main__":
+    crawl(username);
